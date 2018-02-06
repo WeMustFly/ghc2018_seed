@@ -33,7 +33,7 @@ fs.readdir(pathIn, (err, items) => {
 					keys.map((key, i) => input[key] = +values[i])
 				} else {
 					if (line !== '') {
-					    input.data.push(line)
+					    input.data.push(line.split(''))
 					}
 				}
 		    })
