@@ -63,3 +63,4 @@ typings/
 # GHC
 in/*.in
 out/*.out
+*.zip
