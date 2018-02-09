@@ -55,7 +55,77 @@ class Slices {
 			}
 		}
 	}
+	
+	checkVerticalGrowing(r, slice) {
+		if (r < 0 || r >= this.pizza.R) {
+			return false
+		}
 
+		for (let c = slice.c1; c <= slice.c2; c++) {
+			if (this.map[r][c] === 1) {
+				return false
+			}
+		}
+
+		return true
+	}
+
+	checkHorizontalGrowing(c, slice) {
+		if (c < 0 || c >= this.pizza.C) {
+			return false
+		}
+
+		for (let r = slice.r1; r <= slice.r2; r++) {
+			if (this.map[r][c] === 1) {
+				return false
+			}
+		}
+
+		return true
+	}
+
+	grow() {
+		let points = 0
+		while (points !== this.getPoints()) {
+			for (let i in this.items) {
+				let slice = this.items[i]
+
+				if (this.checkVerticalGrowing(slice.r1 - 1, slice)) {
+					slice.r1--
+
+					for (let c = slice.c1; c <= slice.c2; c++) {
+						this.map[slice.r1][c] = 1
+					}
+				}
+
+				if (this.checkVerticalGrowing(slice.r2 + 1, slice)) {
+					slice.r2++
+
+					for (let c = slice.c1; c <= slice.c2; c++) {
+						this.map[slice.r2][c] = 1
+					}
+				}
+
+				if (this.checkHorizontalGrowing(slice.c1 - 1, slice)) {
+					slice.c1--
+
+					for (let r = slice.r1; r <= slice.r2; r++) {
+						this.map[r][slice.c1] = 1
+					}
+				}
+
+				if (this.checkHorizontalGrowing(slice.c2 + 1, slice)) {
+					slice.c2++
+
+					for (let r = slice.r1; r <= slice.r2; r++) {
+						this.map[r][slice.c2] = 1
+					}
+				}
+			}
+
+			points = this.getPoints()
+		}
+	}
 
 	getPoints() {
 		return this.items.length ? this.items.reduce((a, c) => a + c.getPoints(), 0) : 0
@@ -118,6 +188,7 @@ const run = input => {
 	const slicer = new Slicer(input.L, input.H)
 
 	let slices = slicer.slice(pizza) 
+	slices.grow()
 
 	console.log('Points: ' + slices.getPoints())
 
