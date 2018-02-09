@@ -1,44 +1,91 @@
 'use strict'
 
-const run = input => {
-	let output = ''
+class Pizza {
+	constructor(R, C, map) {
+		this.R = R
+		this.C = C
+		this.map = map
+		this.t = 0
+		this.m = 0
 
-	const pizza = input.data
-	const R = input.R
-	const C = input.C
-	const L = input.L
-	const H = input.H
+		this.map.forEach(row => row.forEach(cell => cell === 'T' ? this.t++ : this.m++))
+	}
 
-	const isSlice = (pizza, L, r1, c1, r2, c2) => {
-		let m = 0
-		let t = 0
+}
 
-		for (let r = r1; r <= r2; r++) {
-			for (let c = c1; c <= c2; c++) {
-				let cell = pizza[r][c]
+class Slice {
+	constructor(r1, c1, r2, c2) {
+		this.r1 = r1
+		this.c1 = c1
+		this.r2 = r2
+		this.c2 = c2
+	}
 
-				cell === 'M' && m++
-				cell === 'T' && t++
 
-				if (m >= L && t >= L) {
-					return true
+	getPoints() {
+		return (this.r2 - this.r1 + 1) * (this.c2 - this.c1 + 1)
+	}
+}
+
+class Slices {
+	constructor(pizza) {
+		this.pizza = pizza
+		this.items = []
+
+		this.map = []
+		for (let i = 0; i < pizza.R; i++) {
+			this.map.push('0'.repeat(pizza.C).split('').map(x => +x))
+		}
+	}
+
+	add(slice) {
+		for (let r = slice.r1; r <= slice.r2; r++) {
+			for (let c = slice.c1; c <= slice.c2; c++) {
+				if (this.map[r][c] === 1) {
+					return false
 				}
 			}
 		}
 
-		return false
+		this.items.push(slice)
+
+		for (let r = slice.r1; r <= slice.r2; r++) {
+			for (let c = slice.c1; c <= slice.c2; c++) {
+				this.map[r][c] = 1
+			}
+		}
 	}
 
-	const getSlices = (pizza, height, width, R, C, L) => {
-		let slices = []
 
-		for (let r1 = 0; r1 + height <= R; r1++) {
-		    for (let c1 = 0; c1 + width <= C; c1++) {
-				let r2 = r1 + height - 1
-				let c2 = c1 + width - 1
+	getPoints() {
+		return this.items.length ? this.items.reduce((a, c) => a + c.getPoints(), 0) : 0
+	}
+}
 
-				if (isSlice(pizza, L, r1, c1, r2, c2)) {
-					slices.push([r1, c1, r2, c2])
+class Slicer {
+	constructor(L, H) {
+		this.L = L
+		this.S = L * 2 // Square
+		this.H = H
+	}
+
+	slice(pizza) {
+		let slices = new Slices(pizza)
+
+		for (let h = 1; h <= this.S; h++) {
+			for (let w = 1; w <= this.S; w++) {
+				if (h * w !== this.S) {
+					continue
+				}
+
+				for (let r = 0; r < pizza.R - h; r++) {
+					for (let c = 0; c < pizza.C - w; c++) {
+						let slice = new Slice(r, c, r + h - 1, c + w - 1)
+
+						if (this.check(pizza, slice)) {
+							slices.add(slice)
+						}
+					}
 				}
 			}
 		}
@@ -46,82 +93,37 @@ const run = input => {
 		return slices
 	}
 
-	let slices = []
+	check(pizza, slice) {
+		let t = 0
+		let m = 0
 
-	for (let height = 1; height <= R; height++) {
-	    console.log(`Current height of slice: ${height}`)
-
-	    for (let width = 1; width <= C; width++) {
-			if (width * height > H) {
-				continue
-			}
-
-			slices = slices.concat(getSlices(pizza, height, width, R, C, L))
-		}
-	}
-	console.log(`Total slices: ${slices.length}`)
-
-	const sumGroup = group => group.reduce(
-		(a, s) => a + (s[2] - s[0] + 1) * (s[3] - s[1] + 1), 0
-	)
-
-	const cmpGroups = (group1, group2) => {
-		let s1 = sumGroup(group1)
-		let s2 = sumGroup(group2)
-
-		if (s1 === s2) {
-			return 0
-		} else if (s1 > s2) {
-			return 1
-		} else {
-			return -1
-		}
-	}
-
-	const overlap = (group, slice) => {
-		const intersect = (x1, y1, x2, y2, X1, Y1, X2, Y2) =>
-			((x1 >= X1 && x1 <= X2) && (y1 >= Y1 && y1 <= Y2))
-			|| ((x1 >= X1 && x1 <= X2) && (y2 >= Y1 && y2 <= Y2))
-			|| ((x2 >= X1 && x2 <= X2) && (y1 >= Y1 && y1 <= Y2))
-			|| ((x2 >= X1 && x2 <= X2) && (y2 >= Y1 && y2 <= Y2))
-			|| ((x1 <= X1 && x2 >= X2) && (y1 === y2 && y1 >= Y1 && y1 <= y2))
-
-		let [Y1, X1, Y2, X2] = slice
-
-		for (let i = 0; i < group.length; i++) {
-			let [y1, x1, y2, x2] = group[i]
-
-			if (
-				intersect(x1, y1, x2, y2, X1, Y1, X2, Y2)
-				|| intersect(X1, Y1, X2, Y2, x1, y1, x2, y2)
-			) {
-				return true
-			}
-		}
-		
-		return false
-	}
-
-	let group = []
-	for (let i = 0; i < slices.length; i++) {
-	    console.log(`Group ${i} from ${slices.length}`)
-
-		let tmpGroup = [slices[i]]
-
-	    for (let j = i + 1; j < slices.length; j++) {
-			if (false === overlap(tmpGroup, slices[j])) {
-			    tmpGroup.push(slices[j])
+		for (let r = slice.r1; r <= slice.r2; r++) {
+			for (let c = slice.c1; c <= slice.c2; c++) {
+				if (pizza.map[r][c] === 'T') {
+					t++
+				} else {
+					m++
+				}
 			}
 		}
 
-		if (!group.length || cmpGroups(group, tmpGroup) === -1) {
-			group = tmpGroup
-		}
+		return t >= this.L && m >= this.L
 	}
+}
 
-	console.log('Points: ' + sumGroup(group))
+const run = input => {
+	let output = ''
 
-	output = group.length + "\n" + group.map(x => x.join(' ')).join("\n")
+	const pizza = new Pizza(input.R, input.C, input.data)
+	const slicer = new Slicer(input.L, input.H)
+
+	let slices = slicer.slice(pizza) 
+
+	console.log('Points: ' + slices.getPoints())
+
+	output = slices.items.length
+		+ "\n"
+		+ slices.items.map(x => `${x.r1} ${x.c1} ${x.r2} ${x.c2}`).join("\n")
 
 	return output
 }
