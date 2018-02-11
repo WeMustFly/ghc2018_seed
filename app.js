@@ -2,55 +2,50 @@
 
 const fs = require('fs')
 const zip = require('bestzip')
-const run = require('./run')
+const Model = require('./model')
 
 const pathIn = './in'
 const pathOut = './out'
 const keys = ['R', 'C', 'L', 'H']
 const filenames = ['example.in', 'small.in', 'medium.in', 'big.in']
-const sourceFilenames = ['app.js', 'run.js']
+const sourceFilenames = ['app.js', 'model.js']
 
 fs.readdir(pathIn, (err, items) => {
 	if (err) {
 		return
-	} 
+	}
 
 	for (let item of items) {
 		if (filenames.indexOf(item) === -1) {
 			continue
 		}
 
-		let input = {}
-		let output = ''
-
-		input.data = []
-
 		const fileContent = fs.readFileSync(pathIn + '/' + item, 'ascii')
 
-		fileContent
+		let input = fileContent
 			.split("\n")
+			.filter(x => !!x)
 			.map((line, i) => {
-				if (i === 0) {
-					let values = line.split(' ')
-					keys.map((key, i) => input[key] = +values[i])
-				} else {
-					if (line !== '') {
-					    input.data.push(line.split(''))
-					}
+				let values = line.split(line.indexOf(' ') > -1 ? ' ' : '')
+
+				if (/^\d/.exec(values[0])) {
+					values = values.map(v => +v)
 				}
+
+				return values
 		    })
 
 		let filenameOut = item.split('.')[0] + '.out'
 
-		output = run(input)
+		let model = new Model(input)
 
-		fs.writeFile(pathOut + "/" + filenameOut, output, err => {
-			if (err) {
-				return console.log(err)
-			}
+		model.run()
 
-			console.log(`The file '${filenameOut}' was saved!`)
-		}) 
+		fs.writeFile(
+			pathOut + "/" + filenameOut,
+			model.parseOutput(),
+			err => console.log(!err ? `The file '${filenameOut}' was saved!` : err)
+		) 
 	}
 })
 
