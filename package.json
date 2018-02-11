@@ -1,0 +1,22 @@
+{
+  "name": "ghc_seed",
+  "version": "1.0.0",
+  "description": "Google Hash Code Seed",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/WeMustFly/ghc2018_seed.git"
+  },
+  "author": "Oleg L",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/WeMustFly/ghc2018_seed/issues"
+  },
+  "homepage": "https://github.com/WeMustFly/ghc2018_seed#readme",
+  "dependencies": {
+    "bestzip": "^1.1.4"
+  }
+}

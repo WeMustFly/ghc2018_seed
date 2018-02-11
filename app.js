@@ -1,12 +1,14 @@
 'use strict'
 
 const fs = require('fs')
+const zip = require('bestzip')
 const run = require('./run')
 
 const pathIn = './in'
 const pathOut = './out'
 const keys = ['R', 'C', 'L', 'H']
 const filenames = ['example.in', 'small.in', 'medium.in', 'big.in']
+const sourceFilenames = ['app.js', 'run.js']
 
 fs.readdir(pathIn, (err, items) => {
 	if (err) {
@@ -50,4 +52,11 @@ fs.readdir(pathIn, (err, items) => {
 			console.log(`The file '${filenameOut}' was saved!`)
 		}) 
 	}
+})
+
+zip('./source.zip', sourceFilenames, (err) => {
+	console[err ? 'error' : 'log'](err
+		? err.stack
+		: `Sources have been zipped!`
+	)
 })
