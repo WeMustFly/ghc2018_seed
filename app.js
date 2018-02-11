@@ -2,13 +2,13 @@
 
 const fs = require('fs')
 const zip = require('bestzip')
-const Model = require('./model')
+const Model = require('./src/model')
 
 const pathIn = './in'
 const pathOut = './out'
 const keys = ['R', 'C', 'L', 'H']
 const filenames = ['example.in', 'small.in', 'medium.in', 'big.in']
-const sourceFilenames = ['app.js', 'model.js']
+const sourceFilenames = ['app.js', 'src/']
 
 fs.readdir(pathIn, (err, items) => {
 	if (err) {

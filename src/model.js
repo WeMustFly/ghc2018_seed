@@ -1,8 +1,7 @@
 'use strict'
 
-/**
- * Here is the place for our classes
- */
+const {Entity} = require('./entities')
+const {Processor} = require('./processors')
 
 class Model {
 	constructor(input) {
