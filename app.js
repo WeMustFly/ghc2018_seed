@@ -6,6 +6,7 @@ const Model = require('./src/model')
 
 const pathIn = './in'
 const pathOut = './out'
+const filenames = ['*'] //['app.js', 'src/']
 
 fs.readdir(pathIn, (err, items) => {
 	if (err) {
