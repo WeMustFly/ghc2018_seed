@@ -6,9 +6,7 @@ const Model = require('./src/model')
 
 const pathIn = './in'
 const pathOut = './out'
-const keys = ['R', 'C', 'L', 'H']
-const filenames = ['example.in', 'small.in', 'medium.in', 'big.in']
-const sourceFilenames = ['app.js', 'src/']
+const filenames = ['*'] //['app.js', 'src/']
 
 fs.readdir(pathIn, (err, items) => {
 	if (err) {
@@ -16,7 +14,9 @@ fs.readdir(pathIn, (err, items) => {
 	}
 
 	for (let item of items) {
-		if (filenames.indexOf(item) === -1) {
+		if (filenames.indexOf('*') === -1
+			&& filenames.indexOf(item) === -1
+		) {
 			continue
 		}
 
