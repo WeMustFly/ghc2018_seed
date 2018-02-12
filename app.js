@@ -7,7 +7,6 @@ const Model = require('./src/model')
 const pathIn = './in'
 const pathOut = './out'
 const filenames = ['*'] //['app.js', 'src/']
-const sourceFilenames = ['src/', 'app.js']
 
 fs.readdir(pathIn, (err, items) => {
 	if (err) {
@@ -50,7 +49,7 @@ fs.readdir(pathIn, (err, items) => {
 	}
 })
 
-zip('./source.zip', sourceFilenames, (err) => {
+zip('./source.zip', ['src/', 'app.js'], (err) => {
 	console[err ? 'error' : 'log'](err
 		? err.stack
 		: `Sources have been zipped!`
