@@ -46,11 +46,33 @@ class Model {
 	}
 
 	run() {
-		this.entities.output = this.entities.input
+		let servers = this.entities.input.servers
+		let videos = this.entities.input.videos
+
+		for (let video of videos) {
+			for (let server of servers) {
+				let s = server.videos.reduce((a, c) => a + c.size, 0)
+
+				if (server.capacity <= video.size + s) {
+					server.videos.push(video)
+				}
+			}
+		}
 	}
 
 	parseOutput() {
-		return this.entities.output.toString()
+		let output = ''
+		let servers = this.entities.input.servers
+
+		output += servers.filter(x => x.videos.length).length
+		output += "\n"
+
+		output += servers
+			.filter(x => x.videos.length)
+			.map(x => x.id + ' ' + x.videos.map(x => x.id).join(' '))
+			.join('\n')
+
+		return output
 	}
 }
 
