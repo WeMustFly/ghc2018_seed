@@ -17,6 +17,7 @@
   },
   "homepage": "https://github.com/WeMustFly/ghc2018_seed#readme",
   "dependencies": {
-    "bestzip": "^1.1.4"
+    "bestzip": "^1.1.4",
+    "standard": "^11.0.0"
   }
 }
