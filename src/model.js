@@ -4,76 +4,66 @@ const {Video, Endpoint, Server, Connect, Requests} = require('./entities')
 const {Processor} = require('./processors')
 
 class Model {
-	constructor(input) {
-		this.input = input
-		this.entities = {input: {}, output: {}}
-		this.parseInput()
-	}
+  constructor (input) {
+    this.input = input
+    this.entities = {input: {}, output: {}}
+    this.parseInput()
+  }
 
-	parseInput() {
-		let inp = this.entities.input;
+  parseInput () {
+    let inp = this.entities.input
 
-		inp.videos = []
-		for (let i = 0; i < this.input[0][0]; i++) {
-			inp.videos.push(new Video(i, this.input[1][i]))
-		}
+    inp.videos = []
+    for (let i = 0; i < this.input[0][0]; i++) {
+      inp.videos.push(new Video(i, this.input[1][i]))
+    }
 
-		inp.servers = []
-		for (let i = 0; i < this.input[0][3]; i++) {
-			inp.servers.push(new Server(i, this.input[0][4]))
-		}
+    inp.servers = []
+    for (let i = 0; i < this.input[0][3]; i++) {
+      inp.servers.push(new Server(i, this.input[0][4]))
+    }
 
-		let j = 2
-		inp.endpoints = []
-		for (let i = 0; i < this.input[0][1]; i++) {
-			let endpoint = new Endpoint(i, this.input[j][0])
+    let j = 2
+    inp.endpoints = []
+    for (let i = 0; i < this.input[0][1]; i++) {
+      let endpoint = new Endpoint(i, this.input[j][0])
 
-			inp.endpoints.push(endpoint)
+      inp.endpoints.push(endpoint)
 
-			for (let x = 0; x < this.input[j][1]; x++) {
-				let row = this.input[j + x + 1]
-				endpoint.connections.push(new Connect(x, inp.servers[row[0]], row[1]))
-			}
-			j += this.input[j][1] + 1
-		}
+      for (let x = 0; x < this.input[j][1]; x++) {
+        let row = this.input[j + x + 1]
+        endpoint.connections.push(new Connect(x, inp.servers[row[0]], row[1]))
+      }
+      j += this.input[j][1] + 1
+    }
 
-		inp.requests = []
-		for (let i = 0; i < this.input[0][2]; i++) {
-			let row = this.input[j]
-			inp.requests.push(new Requests(inp.videos[row[0]], inp.endpoints[row[1]], row[2]))
-			j++
-		}
-	}
+    inp.requests = []
+    for (let i = 0; i < this.input[0][2]; i++) {
+      let row = this.input[j]
+      inp.requests.push(new Requests(inp.videos[row[0]], inp.endpoints[row[1]], row[2]))
+      j++
+    }
+  }
 
-	run() {
-		let servers = this.entities.input.servers
-		let videos = this.entities.input.videos
+  process () {
+    const processor = new Processor(this.entities)
+    processor.process()
+  }
 
-		for (let video of videos) {
-			for (let server of servers) {
-				let s = server.videos.reduce((a, c) => a + c.size, 0)
+  parseOutput () {
+    let output = ''
+    let servers = this.entities.output.servers
 
-				if (server.capacity <= video.size + s) {
-					server.videos.push(video)
-				}
-			}
-		}
-	}
+    output += servers.filter(x => x.videos.length).length
+    output += '\n'
 
-	parseOutput() {
-		let output = ''
-		let servers = this.entities.input.servers
+    output += servers
+      .filter(x => x.videos.length)
+      .map(x => x.id + ' ' + x.videos.map(x => x.id).join(' '))
+      .join('\n')
 
-		output += servers.filter(x => x.videos.length).length
-		output += "\n"
-
-		output += servers
-			.filter(x => x.videos.length)
-			.map(x => x.id + ' ' + x.videos.map(x => x.id).join(' '))
-			.join('\n')
-
-		return output
-	}
+    return output
+  }
 }
 
 module.exports = Model
