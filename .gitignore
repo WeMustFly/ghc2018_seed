@@ -64,3 +64,6 @@ typings/
 in/*.in
 out/*.out
 *.zip
+
+# Intellij IDE
+.idea
