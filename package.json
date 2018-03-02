@@ -4,7 +4,8 @@
   "description": "Google Hash Code Seed",
   "main": "app.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "flow": "flow"
   },
   "repository": {
     "type": "git",
@@ -19,5 +20,8 @@
   "dependencies": {
     "bestzip": "^1.1.4",
     "standard": "^11.0.0"
+  },
+  "devDependencies": {
+    "flow-bin": "^0.66.0"
   }
 }
